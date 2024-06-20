@@ -1,0 +1,49 @@
+set cut_paste_input [stack 0]
+version 15.0 v3
+push $cut_paste_input
+Group {
+ name depthToHaze
+ tile_color 0x79a9ffff
+ selected true
+ xpos -40
+ ypos -273
+ addUserKnob {20 User}
+ addUserKnob {7 density}
+ density 0.000172
+ addUserKnob {41 from0 l "depth channel" T Copy1.from0}
+}
+ Input {
+  inputs 0
+  name Input
+  xpos -40
+  ypos -9
+ }
+set Na10abc00 [stack 0]
+push $Na10abc00
+ Copy {
+  inputs 2
+  from0 depth.Z
+  to0 rgba.red
+  name Copy1
+  xpos -40
+  ypos 73
+ }
+ Expression {
+  temp_name0 d
+  temp_expr0 parent.density
+  temp_name1 s
+  temp_expr1 r
+  expr0 "1-pow(1-d, s)"
+  expr1 "1-pow(1-d, s)"
+  expr2 "1-pow(1-d, s)"
+  expr3 "1-pow(1-d, s)"
+  name Expression7
+  xpos -40
+  ypos 167
+ }
+ Output {
+  name Output1
+  xpos -40
+  ypos 299
+ }
+end_group

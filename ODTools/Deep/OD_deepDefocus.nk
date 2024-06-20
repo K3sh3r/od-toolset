@@ -1,0 +1,1702 @@
+set cut_paste_input [stack 0]
+version 15.0 v3
+push $cut_paste_input
+Group {
+ name OD_deepDefocus1
+ knobChanged "import copy\n\n\nn = nuke.thisNode()\ntk = nuke.thisKnob()\n\n\n#disable slice knobs if auto selected\n\nif tk.name() == \"autoSlices\":\n    sliceKnobs = \[n\[\"slices\"], n\[\"near\"], n\[\"far\"]]\n    for x in sliceKnobs:\n        x.setEnabled(not tk.value())\n\n#limit minimum slices to 1\n\nif tk.name() == \"slices\":\n    if tk.value() <1:\n        tk.setValue(1)\n\n\n\n#create slices\nif tk.name() == \"slices\":\n    \n    slices = tk.getValue()\n    \n    if slices<1:\n        slices=1\n\n    n.begin()\n\n    dotParent = nuke.toNode(\"Dot1\")\n\n    for old in nuke.allNodes(\"Group\"):\n        if \"deepSlice\" in old.name() and \"deepSlice1\" not in old.name():\n            nuke.delete(old)\n\n    for old in nuke.allNodes(\"Merge2\"):\n        if old.name() not in \"autoSlice_under\":\n            nuke.delete(old)\n\n\n    nukescripts.clear_selection_recursive()\n    sliceMaster = nuke.toNode(\"deepSlice1\")\n    sliceMaster.setSelected(1)\n    nuke.nodeCopy(\"%clipboard%\")\n    masterPos = \[sliceMaster\[\"xpos\"].value(), sliceMaster\[\"ypos\"].value()]\n    bPipe = sliceMaster\n    t = 2\n\n    while t<=slices:\n    \n        nukescripts.clear_selection_recursive()\n        sliceCurrent = nuke.nodePaste(\"%clipboard%\")\n        sliceCurrent\[\"xpos\"].setValue(masterPos\[0]-150*(t-1))\n        sliceCurrent\[\"ypos\"].setValue(masterPos\[1])\n        sliceCurrent.setInput(0,dotParent)\n        sliceCurrent.setInput(1,nuke.toNode(\"Dot9\"))\n        sliceCurrent\[\"layer\"].setValue(t)\n\n        m = nuke.createNode(\"Merge2\")\n        m\[\"operation\"].setValue(\"under\")\n        m.setInput(1, sliceCurrent)\n        m.setInput(0, bPipe)\n        bPipe = m\n        t = t+1\n\n    nuke.toNode(\"Switch1\").setInput(0, bPipe)\n\n\n    n.end()\n\n\n\n#change child filters\n\nif tk.name() == \"filter_type\":\n    n.begin()\n    for child in nuke.allNodes(\"Group\"):\n        child\[\"filter_type\"].setValue(tk.value())\n    \n    n.end()"
+ tile_color 0x5fff
+ note_font "Verdana Bold"
+ selected true
+ xpos -260
+ ypos -138
+ addUserKnob {20 OD_deepDefocus_tab l OD_deepDefocus}
+ addUserKnob {6 useGPU l "Use GPU if available" +STARTLINE}
+ useGPU true
+ addUserKnob {4 unit t "unit of distance" M {mm cm dm m inch ft ""}}
+ unit m
+ addUserKnob {26 ""}
+ addUserKnob {7 s l "focal distance" R 1 100}
+ s 10
+ addUserKnob {7 N l f-stop R 0 10}
+ N 1.8
+ addUserKnob {7 f l "focal length" R 0 100}
+ f 50
+ addUserKnob {7 haperture l aperture R 0 50}
+ haperture 24
+ addUserKnob {26 ""}
+ addUserKnob {7 max_size l maximum}
+ max_size 100
+ addUserKnob {7 min_zdepth l min}
+ min_zdepth 1
+ addUserKnob {26 "" +STARTLINE}
+ addUserKnob {26 credit l "" +STARTLINE T "<font size =2><b> Created by: <a href=\"http://www.oliverdaniels.net\"><font color=\"#bbbbbb\" size=2>Oliver Daniels</a></font>"}
+ addUserKnob {20 slices_tab l Slices}
+ addUserKnob {4 output M {Render "Slice visualisation"}}
+ addUserKnob {6 autoSlices l auto +STARTLINE}
+ addUserKnob {3 slices}
+ slices 3
+ addUserKnob {7 near R 0 100}
+ addUserKnob {7 far R 0 100}
+ far 10
+ addUserKnob {26 ""}
+ addUserKnob {22 calcNearFar l "calculate near and far" T "n = nuke.thisNode()\nn.begin()\n\nnuke.toNode(\"CurveTool1\")\[\"go\"].execute()\nnuke.toNode(\"CurveTool2\")\[\"go\"].execute()\n\nn.end()" +STARTLINE}
+ addUserKnob {7 nearCalc l "near (calculated)" R 0 100}
+ nearCalc {{1/CurveTool1.maxlumapixvalue.r}}
+ addUserKnob {7 farCalc l far(calculated) R 0 100}
+ farCalc {{CurveTool2.maxlumapixvalue.r}}
+ addUserKnob {26 ""}
+ addUserKnob {4 depthType l "use channel as depth" M {deep.front deep.back "depth.Z (avg)"}}
+ addUserKnob {6 inpaintSlices l "inpaint slices" +STARTLINE}
+ inpaintSlices true
+ addUserKnob {20 filter_tab l Filter}
+ addUserKnob {4 filter_type l "filter type" M {disc bladed image}}
+ addUserKnob {7 aspect R 0.5 2}
+ aspect 1
+ addUserKnob {20 about l About}
+ addUserKnob {26 credits l "" +STARTLINE T "Due credit to Jed Smith for his OpticalZDefocus tool, the depth calculations from which I pulled for use in this tool.\nI also have to give credit to Xavier Bourque and his tool PxF_DeepDefocus, which also influenced some of the systems in my iteration."}
+}
+ Input {
+  inputs 0
+  name Input
+  xpos -40
+  ypos -273
+ }
+ Dot {
+  name Dot6
+  xpos -6
+  ypos -138
+ }
+set N7ce94400 [stack 0]
+ Dot {
+  name Dot5
+  xpos 874
+  ypos -138
+ }
+set N9d4c8800 [stack 0]
+ DeepToImage2 {
+  name DeepToImage1
+  xpos 840
+  ypos -97
+ }
+ Dot {
+  name Dot7
+  xpos 874
+  ypos 1446
+ }
+ Input {
+  inputs 0
+  name filter
+  xpos 620
+  ypos -9
+  number 1
+ }
+ Transform {
+  scale {{parent.aspect} 1}
+  center {{width/2} {height/2}}
+  name Transform1
+  xpos 620
+  ypos 35
+ }
+ Dot {
+  name Dot9
+  xpos 654
+  ypos 82
+ }
+set N9d4c9400 [stack 0]
+push $N7ce94400
+ Dot {
+  name Dot1
+  xpos -6
+  ypos -94
+ }
+set Nad58000 [stack 0]
+ Dot {
+  name Dot3
+  xpos 214
+  ypos -94
+ }
+set Nad58400 [stack 0]
+ Group {
+  inputs 2
+  name autoSlice2
+  xpos 180
+  ypos 161
+  addUserKnob {20 cropping}
+  addUserKnob {3 output}
+  output {{parent.output}}
+  addUserKnob {7 znear}
+  znear {{parent.s}}
+  addUserKnob {3 depthType}
+  depthType {{parent.depthType}}
+  addUserKnob {20 lensSim l "Lens Simulation"}
+  addUserKnob {3 unit}
+  unit {{parent.unit}}
+  addUserKnob {7 s l "focal distance"}
+  s {{parent.s}}
+  addUserKnob {7 N l f-stop}
+  N {{parent.N}}
+  addUserKnob {7 f l "focal length"}
+  f {{parent.f}}
+  addUserKnob {7 haperture l aperture}
+  haperture {{parent.haperture}}
+  addUserKnob {41 max_size l maximum T ZDefocus1.max_size}
+  addUserKnob {7 min_zdepth l min}
+  min_zdepth {{parent.min_zdepth}}
+  addUserKnob {20 zDefocus l ZDefocus}
+  addUserKnob {41 channels T ZDefocus1.channels}
+  addUserKnob {41 useGPUIfAvailable l "Use GPU if available" T ZDefocus1.useGPUIfAvailable}
+  addUserKnob {26 ""}
+  addUserKnob {41 filter_type l "filter type" T ZDefocus1.filter_type}
+  addUserKnob {41 aspect l "aspect ratio" T ZDefocus1.aspect}
+  addUserKnob {26 ""}
+  addUserKnob {6 inpaint +STARTLINE}
+  inpaint {{parent.inpaintSlices}}
+ }
+  Input {
+   inputs 0
+   name Input
+   xpos 180
+   ypos -229
+  }
+  Dot {
+   name Dot5
+   xpos 214
+   ypos -138
+  }
+set Nad58c00 [stack 0]
+  DeepCrop {
+   znear {{parent.znear}}
+   zfar 0
+   use_zfar false
+   bbox {409.6000061 216 1638.400024 864}
+   use_bbox false
+   name DeepCrop5
+   xpos 180
+   ypos -97
+  }
+  DeepToImage2 {
+   name DeepToImage5
+   xpos 180
+   ypos -53
+  }
+set Nad59400 [stack 0]
+  Dot {
+   name Dot4
+   xpos -116
+   ypos -50
+  }
+  Grade {
+   white {0 1 0 0}
+   name Grade1
+   xpos -150
+   ypos 651
+  }
+  Dot {
+   name Dot3
+   xpos -116
+   ypos 786
+  }
+  Input {
+   inputs 0
+   name Filter
+   xpos 620
+   ypos 255
+   number 1
+  }
+  Dot {
+   name Dot2
+   xpos 654
+   ypos 522
+  }
+push $Nad58c00
+  DeepCrop {
+   znear 0
+   zfar {{parent.znear}}
+   bbox {409.6000061 216 1638.400024 864}
+   use_bbox false
+   name DeepCrop3
+   xpos 290
+   ypos -97
+  }
+  DeepToImage2 {
+   name DeepToImage3
+   xpos 290
+   ypos -53
+  }
+  Expression {
+   expr3 alpha>0.9999
+   name Expression3
+   xpos 290
+   ypos -9
+  }
+  FilterErode {
+   size 0
+   name FilterErode2
+   xpos 290
+   ypos 205
+  }
+  Dot {
+   name Dot6
+   xpos 324
+   ypos 302
+  }
+push $Nad59400
+  Dot {
+   name Dot7
+   xpos -6
+   ypos 38
+  }
+push $Nad59400
+  Shuffle2 {
+   fromInput1 {{0} B}
+   in1 deep
+   out1 depth
+   fromInput2 {{0} B}
+   mappings "1 deep.back 0 1 depth.Z 0 0"
+   name Shuffle2
+   xpos 70
+   ypos 35
+  }
+push $Nad59400
+  Shuffle2 {
+   fromInput1 {{0} B}
+   in1 deep
+   out1 depth
+   fromInput2 {{0} B}
+   mappings "1 deep.front 0 0 depth.Z 0 0"
+   name Shuffle4
+   xpos 180
+   ypos 35
+  }
+  Switch {
+   inputs 3
+   which {{parent.depthType}}
+   name Switch2
+   xpos 180
+   ypos 123
+  }
+  Expression {
+   channel3 depth
+   expr3 depth.Z==inf?0:depth.Z
+   name Expression9
+   xpos 180
+   ypos 211
+  }
+set Na6a9d000 [stack 0]
+  Expression {
+   expr3 depth.Z==0
+   name Expression7
+   xpos 70
+   ypos 255
+  }
+push $Na6a9d000
+  Inpaint2 {
+   inputs 2
+   useGPUIfAvailable {{parent.parent.useGPU}}
+   channels depth
+   fillRegion "Matte Alpha"
+   center {1024 540}
+   name Inpaint4
+   xpos 180
+   ypos 249
+  }
+  Inpaint2 {
+   inputs 2
+   useGPUIfAvailable {{parent.parent.useGPU}}
+   channels rgba
+   fillRegion "Matte Alpha"
+   center {1024 540}
+   name Inpaint5
+   xpos 180
+   ypos 299
+   disable {{1-parent.inpaint}}
+  }
+set N7bcd2000 [stack 0]
+  Dot {
+   name Dot1
+   xpos 104
+   ypos 302
+  }
+  Shuffle2 {
+   fromInput1 {{0} B}
+   in1 depth
+   fromInput2 {{0} B}
+   mappings "4 depth.Z 0 0 rgba.red 0 0 depth.Z 0 0 rgba.green 0 1 depth.Z 0 0 rgba.blue 0 2 depth.Z 0 0 rgba.alpha 0 3"
+   name Shuffle1
+   xpos 70
+   ypos 343
+  }
+  Multiply {
+   channels rgb
+   value {{"parent.unit == 1 ? 10 : parent.unit == 2 ? 100 : parent.unit == 3 ? 1000 : parent.unit == 4 ? 25.4 : parent.unit == 5 ? 304.8 : 1"}}
+   name _UNIT_MULTIPLIER_
+   xpos 70
+   ypos 387
+   addUserKnob {20 User}
+   addUserKnob {7 depth_unit_divider R 0 500}
+   depth_unit_divider {{"parent.unit == 1 ? 10 : parent.unit == 2 ? 100 : parent.unit == 3 ? 1000 : parent.unit == 4 ? 25.4 : parent.unit == 5 ? 304.8 : 1"}}
+  }
+  Expression {
+   temp_name0 zdepth
+   temp_expr0 "r < parent.min_zdepth* _UNIT_MULTIPLIER_.value ? parent.min_zdepth* _UNIT_MULTIPLIER_.value : r"
+   temp_name1 focus_dist
+   temp_expr1 "s * _UNIT_MULTIPLIER_.value"
+   temp_name2 coc
+   temp_expr2 "(fabs(focus_dist - zdepth) * pow(f,2) / (N * zdepth * (focus_dist - f)))"
+   temp_name3 coc_px
+   temp_expr3 "fabs(coc / haperture * input.width / 2)"
+   channel0 rgba
+   expr0 coc_px
+   channel1 none
+   name Generate_Direct_Z
+   xpos 70
+   ypos 431
+   addUserKnob {20 Optical l "Optical Characteristics"}
+   addUserKnob {7 f l "focal length" R 0 500}
+   f {{parent.f}}
+   addUserKnob {7 N l f-stop R 0 44}
+   N {{parent.N}}
+   addUserKnob {7 haperture R 0 50}
+   haperture {{parent.haperture}}
+   addUserKnob {7 s l "focus distance" R 0 1000}
+   s {{parent.s}}
+  }
+push $N7bcd2000
+  Copy {
+   inputs 2
+   from0 rgba.red
+   to0 depth.Z
+   name Copy1
+   xpos 180
+   ypos 425
+  }
+  ZDefocus2 {
+   inputs 2
+   useGPUIfAvailable {{parent.parent.useGPU}}
+   math direct
+   size 1
+   max_size {{parent.parent.max_size}}
+   use_input_channels true
+   aspect {{parent.parent.aspect}}
+   name ZDefocus1
+   xpos 180
+   ypos 513
+  }
+  Clamp {
+   channels alpha
+   name Clamp3
+   xpos 180
+   ypos 689
+  }
+  Switch {
+   inputs 2
+   which {{parent.output}}
+   name Switch1
+   xpos 180
+   ypos 783
+  }
+  Output {
+   name Output1
+   xpos 180
+   ypos 827
+  }
+ end_group
+ Dot {
+  name Dot4
+  xpos 214
+  ypos 214
+ }
+push $N9d4c9400
+push $Nad58400
+ Dot {
+  name Dot2
+  xpos 434
+  ypos -94
+ }
+ Group {
+  inputs 2
+  name autoSlice1
+  selected true
+  xpos 400
+  ypos 161
+  addUserKnob {20 cropping}
+  addUserKnob {3 output}
+  output {{parent.output}}
+  addUserKnob {7 zfar}
+  zfar {{parent.s}}
+  addUserKnob {3 depthType}
+  depthType {{parent.depthType}}
+  addUserKnob {20 lensSim l "Lens Simulation"}
+  addUserKnob {3 unit}
+  unit {{parent.unit}}
+  addUserKnob {7 s l "focal distance"}
+  s {{parent.s}}
+  addUserKnob {7 N l f-stop}
+  N {{parent.N}}
+  addUserKnob {7 f l "focal length"}
+  f {{parent.f}}
+  addUserKnob {7 haperture l aperture}
+  haperture {{parent.haperture}}
+  addUserKnob {41 max_size l maximum T ZDefocus1.max_size}
+  addUserKnob {7 min_zdepth l min}
+  min_zdepth {{parent.min_zdepth}}
+  addUserKnob {20 zDefocus l ZDefocus}
+  addUserKnob {41 channels T ZDefocus1.channels}
+  addUserKnob {41 useGPUIfAvailable l "Use GPU if available" T ZDefocus1.useGPUIfAvailable}
+  addUserKnob {26 ""}
+  addUserKnob {41 filter_type l "filter type" T ZDefocus1.filter_type}
+  addUserKnob {41 aspect l "aspect ratio" T ZDefocus1.aspect}
+  addUserKnob {26 ""}
+  addUserKnob {6 inpaint +STARTLINE}
+  inpaint {{parent.inpaintSlices}}
+ }
+  Input {
+   inputs 0
+   name Input
+   xpos 180
+   ypos -273
+  }
+  Dot {
+   name Dot5
+   xpos 214
+   ypos -182
+  }
+set N1fca5800 [stack 0]
+  DeepCrop {
+   znear 0
+   use_znear false
+   zfar {{parent.zfar}}
+   bbox {409.6000061 216 1638.400024 864}
+   use_bbox false
+   name DeepCrop5
+   xpos 180
+   ypos -141
+  }
+  DeepToImage2 {
+   name DeepToImage5
+   xpos 180
+   ypos -97
+  }
+set N8050000 [stack 0]
+  Dot {
+   name Dot4
+   xpos -116
+   ypos -94
+  }
+  Grade {
+   white {1 0 0 0}
+   white_panelDropped true
+   name Grade1
+   xpos -150
+   ypos 651
+  }
+  Dot {
+   name Dot3
+   xpos -116
+   ypos 786
+  }
+  Input {
+   inputs 0
+   name Filter
+   xpos 620
+   ypos 255
+   number 1
+  }
+  Dot {
+   name Dot2
+   xpos 654
+   ypos 522
+  }
+push $N1fca5800
+  DeepCrop {
+   znear 0
+   zfar 0
+   bbox {409.6000061 216 1638.400024 864}
+   use_bbox false
+   name DeepCrop3
+   xpos 290
+   ypos -141
+  }
+  DeepToImage2 {
+   name DeepToImage3
+   xpos 290
+   ypos -97
+  }
+  Expression {
+   expr3 alpha>0.9999
+   name Expression3
+   xpos 290
+   ypos 167
+  }
+  FilterErode {
+   size 0
+   name FilterErode2
+   xpos 290
+   ypos 205
+  }
+  Dot {
+   name Dot6
+   xpos 324
+   ypos 302
+  }
+push $N8050000
+  Dot {
+   name Dot7
+   xpos -6
+   ypos -6
+  }
+push $N8050000
+  Shuffle2 {
+   fromInput1 {{0} B}
+   in1 deep
+   out1 depth
+   fromInput2 {{0} B}
+   mappings "1 deep.back 0 1 depth.Z 0 0"
+   name Shuffle2
+   xpos 70
+   ypos -9
+  }
+push $N8050000
+  Shuffle2 {
+   fromInput1 {{0} B}
+   in1 deep
+   out1 depth
+   fromInput2 {{0} B}
+   mappings "1 deep.front 0 0 depth.Z 0 0"
+   name Shuffle4
+   xpos 180
+   ypos -9
+  }
+  Switch {
+   inputs 3
+   which {{parent.depthType}}
+   name Switch2
+   xpos 180
+   ypos 79
+  }
+  Expression {
+   channel3 depth
+   expr3 depth.Z==inf?0:depth.Z
+   name Expression9
+   xpos 180
+   ypos 211
+  }
+set Ne0403c00 [stack 0]
+  Expression {
+   expr3 depth.Z==0
+   name Expression7
+   xpos 70
+   ypos 255
+  }
+push $Ne0403c00
+  Inpaint2 {
+   inputs 2
+   useGPUIfAvailable {{parent.parent.useGPU}}
+   channels depth
+   fillRegion "Matte Alpha"
+   center {1024 540}
+   name Inpaint4
+   xpos 180
+   ypos 249
+  }
+  Inpaint2 {
+   inputs 2
+   useGPUIfAvailable {{parent.parent.useGPU}}
+   channels rgba
+   fillRegion "Matte Alpha"
+   center {1024 540}
+   name Inpaint5
+   xpos 180
+   ypos 299
+   disable {{1-parent.inpaint}}
+  }
+set N7a3bec00 [stack 0]
+  Dot {
+   name Dot1
+   xpos 104
+   ypos 302
+  }
+  Shuffle2 {
+   fromInput1 {{0} B}
+   in1 depth
+   fromInput2 {{0} B}
+   mappings "4 depth.Z 0 0 rgba.red 0 0 depth.Z 0 0 rgba.green 0 1 depth.Z 0 0 rgba.blue 0 2 depth.Z 0 0 rgba.alpha 0 3"
+   name Shuffle1
+   xpos 70
+   ypos 343
+  }
+  Multiply {
+   channels rgb
+   value {{"parent.unit == 1 ? 10 : parent.unit == 2 ? 100 : parent.unit == 3 ? 1000 : parent.unit == 4 ? 25.4 : parent.unit == 5 ? 304.8 : 1"}}
+   name _UNIT_MULTIPLIER_
+   xpos 70
+   ypos 387
+   addUserKnob {20 User}
+   addUserKnob {7 depth_unit_divider R 0 500}
+   depth_unit_divider {{"parent.unit == 1 ? 10 : parent.unit == 2 ? 100 : parent.unit == 3 ? 1000 : parent.unit == 4 ? 25.4 : parent.unit == 5 ? 304.8 : 1"}}
+  }
+  Expression {
+   temp_name0 zdepth
+   temp_expr0 "r < parent.min_zdepth* _UNIT_MULTIPLIER_.value ? parent.min_zdepth* _UNIT_MULTIPLIER_.value : r"
+   temp_name1 focus_dist
+   temp_expr1 "s * _UNIT_MULTIPLIER_.value"
+   temp_name2 coc
+   temp_expr2 "(fabs(focus_dist - zdepth) * pow(f,2) / (N * zdepth * (focus_dist - f)))"
+   temp_name3 coc_px
+   temp_expr3 "fabs(coc / haperture * input.width / 2)"
+   channel0 rgba
+   expr0 coc_px
+   channel1 none
+   name Generate_Direct_Z
+   xpos 70
+   ypos 431
+   addUserKnob {20 Optical l "Optical Characteristics"}
+   addUserKnob {7 f l "focal length" R 0 500}
+   f {{parent.f}}
+   addUserKnob {7 N l f-stop R 0 44}
+   N {{parent.N}}
+   addUserKnob {7 haperture R 0 50}
+   haperture {{parent.haperture}}
+   addUserKnob {7 s l "focus distance" R 0 1000}
+   s {{parent.s}}
+  }
+push $N7a3bec00
+  Copy {
+   inputs 2
+   from0 rgba.red
+   to0 depth.Z
+   name Copy1
+   xpos 180
+   ypos 425
+  }
+  ZDefocus2 {
+   inputs 2
+   useGPUIfAvailable {{parent.parent.useGPU}}
+   math direct
+   size 1
+   max_size {{parent.parent.max_size}}
+   use_input_channels true
+   aspect {{parent.parent.aspect}}
+   name ZDefocus1
+   xpos 180
+   ypos 513
+  }
+  Clamp {
+   channels alpha
+   name Clamp3
+   xpos 180
+   ypos 689
+  }
+  Switch {
+   inputs 2
+   which {{parent.output}}
+   name Switch1
+   xpos 180
+   ypos 783
+  }
+  Output {
+   name Output1
+   xpos 180
+   ypos 827
+  }
+ end_group
+ Merge2 {
+  inputs 2
+  operation under
+  name autoSlice_under
+  xpos 400
+  ypos 211
+ }
+push $N9d4c9400
+push $Nad58000
+ Group {
+  inputs 2
+  name deepSlice3
+  xpos -340
+  ypos 161
+  addUserKnob {20 cropping}
+  addUserKnob {3 output}
+  output {{parent.output}}
+  addUserKnob {7 znear}
+  znear {{"layer==1? 0: ((parent.far-parent.near)/slices)*(layer-1)+parent.near"}}
+  addUserKnob {7 zfar}
+  zfar {{((parent.far-parent.near)/slices)*layer+parent.near}}
+  addUserKnob {3 layer}
+  layer 3
+  addUserKnob {3 depthType}
+  depthType {{parent.depthType}}
+  addUserKnob {20 lensSim l "Lens Simulation"}
+  addUserKnob {3 unit}
+  unit {{parent.unit}}
+  addUserKnob {7 s l "focal distance"}
+  s {{parent.s}}
+  addUserKnob {7 N l f-stop}
+  N {{parent.N}}
+  addUserKnob {7 f l "focal length"}
+  f {{parent.f}}
+  addUserKnob {7 haperture l aperture}
+  haperture {{parent.haperture}}
+  addUserKnob {41 max_size l maximum T ZDefocus1.max_size}
+  addUserKnob {7 min_zdepth l min}
+  min_zdepth {{parent.min_zdepth}}
+  addUserKnob {20 zDefocus l ZDefocus}
+  addUserKnob {41 channels T ZDefocus1.channels}
+  addUserKnob {41 useGPUIfAvailable l "Use GPU if available" T ZDefocus1.useGPUIfAvailable}
+  addUserKnob {26 ""}
+  addUserKnob {41 filter_type l "filter type" T ZDefocus1.filter_type}
+  addUserKnob {41 aspect l "aspect ratio" T ZDefocus1.aspect}
+  addUserKnob {26 ""}
+  addUserKnob {6 inpaint +STARTLINE}
+  inpaint {{parent.inpaintSlices}}
+ }
+  Input {
+   inputs 0
+   name Input
+   xpos 180
+   ypos -273
+  }
+  Dot {
+   name Dot5
+   xpos 214
+   ypos -182
+  }
+set N33c20000 [stack 0]
+  DeepCrop {
+   znear {{parent.znear}}
+   zfar {{parent.zfar}}
+   use_zfar {{1-(parent.layer==parent.parent.slices)}}
+   bbox {409.6000061 216 1638.400024 864}
+   use_bbox false
+   name DeepCrop5
+   xpos 180
+   ypos -141
+  }
+  DeepToImage2 {
+   name DeepToImage5
+   xpos 180
+   ypos -97
+  }
+set N33c20800 [stack 0]
+  Dot {
+   name Dot4
+   xpos -116
+   ypos -94
+  }
+  Grade {
+   white {{random(parent.layer)} {random(parent.layer+1)} {random(parent.layer+2)} 1}
+   name Grade1
+   xpos -150
+   ypos 651
+  }
+  Dot {
+   name Dot3
+   xpos -116
+   ypos 786
+  }
+  Input {
+   inputs 0
+   name Filter
+   xpos 620
+   ypos 255
+   number 1
+  }
+  Dot {
+   name Dot2
+   xpos 654
+   ypos 522
+  }
+push $N33c20000
+  DeepCrop {
+   znear 0
+   zfar {{parent.znear}}
+   bbox {409.6000061 216 1638.400024 864}
+   use_bbox false
+   name DeepCrop3
+   xpos 290
+   ypos -141
+  }
+  DeepToImage2 {
+   name DeepToImage3
+   xpos 290
+   ypos -97
+  }
+  Expression {
+   expr3 alpha>0.9999
+   name Expression3
+   xpos 290
+   ypos 167
+  }
+  FilterErode {
+   size 0
+   name FilterErode2
+   xpos 290
+   ypos 205
+  }
+  Dot {
+   name Dot6
+   xpos 324
+   ypos 302
+  }
+push $N33c20800
+  Dot {
+   name Dot7
+   xpos -6
+   ypos -6
+  }
+push $N33c20800
+  Shuffle2 {
+   fromInput1 {{0} B}
+   in1 deep
+   out1 depth
+   fromInput2 {{0} B}
+   mappings "1 deep.back 0 1 depth.Z 0 0"
+   name Shuffle3
+   xpos 70
+   ypos -9
+  }
+push $N33c20800
+  Shuffle2 {
+   fromInput1 {{0} B}
+   in1 deep
+   out1 depth
+   fromInput2 {{0} B}
+   mappings "1 deep.front 0 0 depth.Z 0 0"
+   name Shuffle2
+   xpos 180
+   ypos -9
+  }
+  Switch {
+   inputs 3
+   which {{parent.depthType}}
+   name Switch2
+   xpos 180
+   ypos 79
+  }
+  Expression {
+   channel3 depth
+   expr3 depth.Z==inf?0:depth.Z
+   name Expression9
+   xpos 180
+   ypos 211
+  }
+set Nb968400 [stack 0]
+  Expression {
+   expr3 depth.Z==0
+   name Expression7
+   xpos 70
+   ypos 255
+  }
+push $Nb968400
+  Inpaint2 {
+   inputs 2
+   useGPUIfAvailable {{parent.parent.useGPU}}
+   channels depth
+   fillRegion "Matte Alpha"
+   center {1024 540}
+   name Inpaint4
+   xpos 180
+   ypos 249
+  }
+  Inpaint2 {
+   inputs 2
+   useGPUIfAvailable {{parent.parent.useGPU}}
+   channels rgba
+   fillRegion "Matte Alpha"
+   center {1024 540}
+   name Inpaint5
+   xpos 180
+   ypos 299
+   disable {{1-parent.inpaint}}
+  }
+set Nb969400 [stack 0]
+  Dot {
+   name Dot1
+   xpos 104
+   ypos 302
+  }
+  Shuffle2 {
+   fromInput1 {{0} B}
+   in1 depth
+   fromInput2 {{0} B}
+   mappings "4 depth.Z 0 0 rgba.red 0 0 depth.Z 0 0 rgba.green 0 1 depth.Z 0 0 rgba.blue 0 2 depth.Z 0 0 rgba.alpha 0 3"
+   name Shuffle1
+   xpos 70
+   ypos 343
+  }
+  Multiply {
+   channels rgb
+   value {{"parent.unit == 1 ? 10 : parent.unit == 2 ? 100 : parent.unit == 3 ? 1000 : parent.unit == 4 ? 25.4 : parent.unit == 5 ? 304.8 : 1"}}
+   name _UNIT_MULTIPLIER_
+   xpos 70
+   ypos 387
+   addUserKnob {20 User}
+   addUserKnob {7 depth_unit_divider R 0 500}
+   depth_unit_divider {{"parent.unit == 1 ? 10 : parent.unit == 2 ? 100 : parent.unit == 3 ? 1000 : parent.unit == 4 ? 25.4 : parent.unit == 5 ? 304.8 : 1"}}
+  }
+  Expression {
+   temp_name0 zdepth
+   temp_expr0 "r < parent.min_zdepth* _UNIT_MULTIPLIER_.value ? parent.min_zdepth* _UNIT_MULTIPLIER_.value : r"
+   temp_name1 focus_dist
+   temp_expr1 "s * _UNIT_MULTIPLIER_.value"
+   temp_name2 coc
+   temp_expr2 "(fabs(focus_dist - zdepth) * pow(f,2) / (N * zdepth * (focus_dist - f)))"
+   temp_name3 coc_px
+   temp_expr3 "fabs(coc / haperture * input.width / 2)"
+   channel0 rgba
+   expr0 coc_px
+   channel1 none
+   name Generate_Direct_Z
+   xpos 70
+   ypos 431
+   addUserKnob {20 Optical l "Optical Characteristics"}
+   addUserKnob {7 f l "focal length" R 0 500}
+   f {{parent.f}}
+   addUserKnob {7 N l f-stop R 0 44}
+   N {{parent.N}}
+   addUserKnob {7 haperture R 0 50}
+   haperture {{parent.haperture}}
+   addUserKnob {7 s l "focus distance" R 0 1000}
+   s {{parent.s}}
+  }
+push $Nb969400
+  Copy {
+   inputs 2
+   from0 rgba.red
+   to0 depth.Z
+   name Copy1
+   xpos 180
+   ypos 425
+  }
+  ZDefocus2 {
+   inputs 2
+   useGPUIfAvailable {{parent.parent.useGPU}}
+   math direct
+   size 1
+   max_size {{parent.parent.max_size}}
+   use_input_channels true
+   aspect {{parent.parent.aspect}}
+   name ZDefocus1
+   xpos 180
+   ypos 513
+  }
+  Clamp {
+   channels alpha
+   name Clamp3
+   xpos 180
+   ypos 689
+  }
+  Switch {
+   inputs 2
+   which {{parent.output}}
+   name Switch1
+   xpos 180
+   ypos 783
+  }
+  Output {
+   name Output1
+   xpos 180
+   ypos 827
+  }
+ end_group
+push $N9d4c9400
+push $Nad58000
+ Group {
+  inputs 2
+  name deepSlice2
+  xpos -190
+  ypos 161
+  addUserKnob {20 cropping}
+  addUserKnob {3 output}
+  output {{parent.output}}
+  addUserKnob {7 znear}
+  znear {{"layer==1? 0: ((parent.far-parent.near)/slices)*(layer-1)+parent.near"}}
+  addUserKnob {7 zfar}
+  zfar {{((parent.far-parent.near)/slices)*layer+parent.near}}
+  addUserKnob {3 layer}
+  layer 2
+  addUserKnob {3 depthType}
+  depthType {{parent.depthType}}
+  addUserKnob {20 lensSim l "Lens Simulation"}
+  addUserKnob {3 unit}
+  unit {{parent.unit}}
+  addUserKnob {7 s l "focal distance"}
+  s {{parent.s}}
+  addUserKnob {7 N l f-stop}
+  N {{parent.N}}
+  addUserKnob {7 f l "focal length"}
+  f {{parent.f}}
+  addUserKnob {7 haperture l aperture}
+  haperture {{parent.haperture}}
+  addUserKnob {41 max_size l maximum T ZDefocus1.max_size}
+  addUserKnob {7 min_zdepth l min}
+  min_zdepth {{parent.min_zdepth}}
+  addUserKnob {20 zDefocus l ZDefocus}
+  addUserKnob {41 channels T ZDefocus1.channels}
+  addUserKnob {41 useGPUIfAvailable l "Use GPU if available" T ZDefocus1.useGPUIfAvailable}
+  addUserKnob {26 ""}
+  addUserKnob {41 filter_type l "filter type" T ZDefocus1.filter_type}
+  addUserKnob {41 aspect l "aspect ratio" T ZDefocus1.aspect}
+  addUserKnob {26 ""}
+  addUserKnob {6 inpaint +STARTLINE}
+  inpaint {{parent.inpaintSlices}}
+ }
+  Input {
+   inputs 0
+   name Input
+   xpos 180
+   ypos -273
+  }
+  Dot {
+   name Dot5
+   xpos 214
+   ypos -182
+  }
+set N2ef24400 [stack 0]
+  DeepCrop {
+   znear {{parent.znear}}
+   zfar {{parent.zfar}}
+   use_zfar {{1-(parent.layer==parent.parent.slices)}}
+   bbox {409.6000061 216 1638.400024 864}
+   use_bbox false
+   name DeepCrop5
+   xpos 180
+   ypos -141
+  }
+  DeepToImage2 {
+   name DeepToImage5
+   xpos 180
+   ypos -97
+  }
+set N2ef24c00 [stack 0]
+  Dot {
+   name Dot4
+   xpos -116
+   ypos -94
+  }
+  Grade {
+   white {{random(parent.layer)} {random(parent.layer+1)} {random(parent.layer+2)} 1}
+   name Grade1
+   xpos -150
+   ypos 651
+  }
+  Dot {
+   name Dot3
+   xpos -116
+   ypos 786
+  }
+  Input {
+   inputs 0
+   name Filter
+   xpos 620
+   ypos 255
+   number 1
+  }
+  Dot {
+   name Dot2
+   xpos 654
+   ypos 522
+  }
+push $N2ef24400
+  DeepCrop {
+   znear 0
+   zfar {{parent.znear}}
+   bbox {409.6000061 216 1638.400024 864}
+   use_bbox false
+   name DeepCrop3
+   xpos 290
+   ypos -141
+  }
+  DeepToImage2 {
+   name DeepToImage3
+   xpos 290
+   ypos -97
+  }
+  Expression {
+   expr3 alpha>0.9999
+   name Expression3
+   xpos 290
+   ypos 167
+  }
+  FilterErode {
+   size 0
+   name FilterErode2
+   xpos 290
+   ypos 205
+  }
+  Dot {
+   name Dot6
+   xpos 324
+   ypos 302
+  }
+push $N2ef24c00
+  Dot {
+   name Dot7
+   xpos -6
+   ypos -6
+  }
+push $N2ef24c00
+  Shuffle2 {
+   fromInput1 {{0} B}
+   in1 deep
+   out1 depth
+   fromInput2 {{0} B}
+   mappings "1 deep.back 0 1 depth.Z 0 0"
+   name Shuffle3
+   xpos 70
+   ypos -9
+  }
+push $N2ef24c00
+  Shuffle2 {
+   fromInput1 {{0} B}
+   in1 deep
+   out1 depth
+   fromInput2 {{0} B}
+   mappings "1 deep.front 0 0 depth.Z 0 0"
+   name Shuffle2
+   xpos 180
+   ypos -9
+  }
+  Switch {
+   inputs 3
+   which {{parent.depthType}}
+   name Switch2
+   xpos 180
+   ypos 79
+  }
+  Expression {
+   channel3 depth
+   expr3 depth.Z==inf?0:depth.Z
+   name Expression9
+   xpos 180
+   ypos 211
+  }
+set N3a198800 [stack 0]
+  Expression {
+   expr3 depth.Z==0
+   name Expression7
+   xpos 70
+   ypos 255
+  }
+push $N3a198800
+  Inpaint2 {
+   inputs 2
+   useGPUIfAvailable {{parent.parent.useGPU}}
+   channels depth
+   fillRegion "Matte Alpha"
+   center {1024 540}
+   name Inpaint4
+   xpos 180
+   ypos 249
+  }
+  Inpaint2 {
+   inputs 2
+   useGPUIfAvailable {{parent.parent.useGPU}}
+   channels rgba
+   fillRegion "Matte Alpha"
+   center {1024 540}
+   name Inpaint5
+   xpos 180
+   ypos 299
+   disable {{1-parent.inpaint}}
+  }
+set N3a199800 [stack 0]
+  Dot {
+   name Dot1
+   xpos 104
+   ypos 302
+  }
+  Shuffle2 {
+   fromInput1 {{0} B}
+   in1 depth
+   fromInput2 {{0} B}
+   mappings "4 depth.Z 0 0 rgba.red 0 0 depth.Z 0 0 rgba.green 0 1 depth.Z 0 0 rgba.blue 0 2 depth.Z 0 0 rgba.alpha 0 3"
+   name Shuffle1
+   xpos 70
+   ypos 343
+  }
+  Multiply {
+   channels rgb
+   value {{"parent.unit == 1 ? 10 : parent.unit == 2 ? 100 : parent.unit == 3 ? 1000 : parent.unit == 4 ? 25.4 : parent.unit == 5 ? 304.8 : 1"}}
+   name _UNIT_MULTIPLIER_
+   xpos 70
+   ypos 387
+   addUserKnob {20 User}
+   addUserKnob {7 depth_unit_divider R 0 500}
+   depth_unit_divider {{"parent.unit == 1 ? 10 : parent.unit == 2 ? 100 : parent.unit == 3 ? 1000 : parent.unit == 4 ? 25.4 : parent.unit == 5 ? 304.8 : 1"}}
+  }
+  Expression {
+   temp_name0 zdepth
+   temp_expr0 "r < parent.min_zdepth* _UNIT_MULTIPLIER_.value ? parent.min_zdepth* _UNIT_MULTIPLIER_.value : r"
+   temp_name1 focus_dist
+   temp_expr1 "s * _UNIT_MULTIPLIER_.value"
+   temp_name2 coc
+   temp_expr2 "(fabs(focus_dist - zdepth) * pow(f,2) / (N * zdepth * (focus_dist - f)))"
+   temp_name3 coc_px
+   temp_expr3 "fabs(coc / haperture * input.width / 2)"
+   channel0 rgba
+   expr0 coc_px
+   channel1 none
+   name Generate_Direct_Z
+   xpos 70
+   ypos 431
+   addUserKnob {20 Optical l "Optical Characteristics"}
+   addUserKnob {7 f l "focal length" R 0 500}
+   f {{parent.f}}
+   addUserKnob {7 N l f-stop R 0 44}
+   N {{parent.N}}
+   addUserKnob {7 haperture R 0 50}
+   haperture {{parent.haperture}}
+   addUserKnob {7 s l "focus distance" R 0 1000}
+   s {{parent.s}}
+  }
+push $N3a199800
+  Copy {
+   inputs 2
+   from0 rgba.red
+   to0 depth.Z
+   name Copy1
+   xpos 180
+   ypos 425
+  }
+  ZDefocus2 {
+   inputs 2
+   useGPUIfAvailable {{parent.parent.useGPU}}
+   math direct
+   size 1
+   max_size {{parent.parent.max_size}}
+   use_input_channels true
+   aspect {{parent.parent.aspect}}
+   name ZDefocus1
+   xpos 180
+   ypos 513
+  }
+  Clamp {
+   channels alpha
+   name Clamp3
+   xpos 180
+   ypos 689
+  }
+  Switch {
+   inputs 2
+   which {{parent.output}}
+   name Switch1
+   xpos 180
+   ypos 783
+  }
+  Output {
+   name Output1
+   xpos 180
+   ypos 827
+  }
+ end_group
+push $N9d4c9400
+push $Nad58000
+ Group {
+  inputs 2
+  name deepSlice1
+  xpos -40
+  ypos 161
+  addUserKnob {20 cropping}
+  addUserKnob {3 output}
+  output {{parent.output}}
+  addUserKnob {7 znear}
+  znear {{"layer==1? 0: ((parent.far-parent.near)/slices)*(layer-1)+parent.near"}}
+  addUserKnob {7 zfar}
+  zfar {{((parent.far-parent.near)/slices)*layer+parent.near}}
+  addUserKnob {3 layer}
+  layer 1
+  addUserKnob {3 depthType}
+  depthType {{parent.depthType}}
+  addUserKnob {20 lensSim l "Lens Simulation"}
+  addUserKnob {3 unit}
+  unit {{parent.unit}}
+  addUserKnob {7 s l "focal distance"}
+  s {{parent.s}}
+  addUserKnob {7 N l f-stop}
+  N {{parent.N}}
+  addUserKnob {7 f l "focal length"}
+  f {{parent.f}}
+  addUserKnob {7 haperture l aperture}
+  haperture {{parent.haperture}}
+  addUserKnob {41 max_size l maximum T ZDefocus1.max_size}
+  addUserKnob {7 min_zdepth l min}
+  min_zdepth {{parent.min_zdepth}}
+  addUserKnob {20 zDefocus l ZDefocus}
+  addUserKnob {41 channels T ZDefocus1.channels}
+  addUserKnob {41 useGPUIfAvailable l "Use GPU if available" T ZDefocus1.useGPUIfAvailable}
+  addUserKnob {26 ""}
+  addUserKnob {41 filter_type l "filter type" T ZDefocus1.filter_type}
+  addUserKnob {41 aspect l "aspect ratio" T ZDefocus1.aspect}
+  addUserKnob {26 ""}
+  addUserKnob {6 inpaint +STARTLINE}
+  inpaint {{parent.inpaintSlices}}
+ }
+  Input {
+   inputs 0
+   name Input
+   xpos 180
+   ypos -273
+  }
+  Dot {
+   name Dot5
+   xpos 214
+   ypos -182
+  }
+set N36364800 [stack 0]
+  DeepCrop {
+   znear {{parent.znear}}
+   zfar {{parent.zfar}}
+   use_zfar {{1-(parent.layer==parent.parent.slices)}}
+   bbox {409.6000061 216 1638.400024 864}
+   use_bbox false
+   name DeepCrop5
+   xpos 180
+   ypos -141
+  }
+  DeepToImage2 {
+   name DeepToImage5
+   xpos 180
+   ypos -97
+  }
+set N36365000 [stack 0]
+  Dot {
+   name Dot4
+   xpos -116
+   ypos -94
+  }
+  Grade {
+   white {{random(parent.layer)} {random(parent.layer+1)} {random(parent.layer+2)} 1}
+   name Grade1
+   xpos -150
+   ypos 651
+  }
+  Dot {
+   name Dot3
+   xpos -116
+   ypos 786
+  }
+  Input {
+   inputs 0
+   name Filter
+   xpos 620
+   ypos 255
+   number 1
+  }
+  Dot {
+   name Dot2
+   xpos 654
+   ypos 522
+  }
+push $N36364800
+  DeepCrop {
+   znear 0
+   zfar {{parent.znear}}
+   bbox {409.6000061 216 1638.400024 864}
+   use_bbox false
+   name DeepCrop3
+   xpos 290
+   ypos -141
+  }
+  DeepToImage2 {
+   name DeepToImage3
+   xpos 290
+   ypos -97
+  }
+  Expression {
+   expr3 alpha>0.9999
+   name Expression3
+   xpos 290
+   ypos 167
+  }
+  FilterErode {
+   size 0
+   name FilterErode2
+   xpos 290
+   ypos 205
+  }
+  Dot {
+   name Dot6
+   xpos 324
+   ypos 302
+  }
+push $N36365000
+  Dot {
+   name Dot7
+   xpos -6
+   ypos -6
+  }
+push $N36365000
+  Shuffle2 {
+   fromInput1 {{0} B}
+   in1 deep
+   out1 depth
+   fromInput2 {{0} B}
+   mappings "1 deep.back 0 1 depth.Z 0 0"
+   name Shuffle3
+   xpos 70
+   ypos -9
+  }
+push $N36365000
+  Shuffle2 {
+   fromInput1 {{0} B}
+   in1 deep
+   out1 depth
+   fromInput2 {{0} B}
+   mappings "1 deep.front 0 0 depth.Z 0 0"
+   name Shuffle2
+   xpos 180
+   ypos -9
+  }
+  Switch {
+   inputs 3
+   which {{parent.depthType}}
+   name Switch2
+   xpos 180
+   ypos 79
+  }
+  Expression {
+   channel3 depth
+   expr3 depth.Z==inf?0:depth.Z
+   name Expression9
+   xpos 180
+   ypos 211
+  }
+set Ne1522c00 [stack 0]
+  Expression {
+   expr3 depth.Z==0
+   name Expression7
+   xpos 70
+   ypos 255
+  }
+push $Ne1522c00
+  Inpaint2 {
+   inputs 2
+   useGPUIfAvailable {{parent.parent.useGPU}}
+   channels depth
+   fillRegion "Matte Alpha"
+   center {1024 540}
+   name Inpaint4
+   xpos 180
+   ypos 249
+  }
+  Inpaint2 {
+   inputs 2
+   useGPUIfAvailable {{parent.parent.useGPU}}
+   channels rgba
+   fillRegion "Matte Alpha"
+   center {1024 540}
+   name Inpaint5
+   xpos 180
+   ypos 299
+   disable {{1-parent.inpaint}}
+  }
+set Ne1523c00 [stack 0]
+  Dot {
+   name Dot1
+   xpos 104
+   ypos 302
+  }
+  Shuffle2 {
+   fromInput1 {{0} B}
+   in1 depth
+   fromInput2 {{0} B}
+   mappings "4 depth.Z 0 0 rgba.red 0 0 depth.Z 0 0 rgba.green 0 1 depth.Z 0 0 rgba.blue 0 2 depth.Z 0 0 rgba.alpha 0 3"
+   name Shuffle1
+   xpos 70
+   ypos 343
+  }
+  Multiply {
+   channels rgb
+   value {{"parent.unit == 1 ? 10 : parent.unit == 2 ? 100 : parent.unit == 3 ? 1000 : parent.unit == 4 ? 25.4 : parent.unit == 5 ? 304.8 : 1"}}
+   name _UNIT_MULTIPLIER_
+   xpos 70
+   ypos 387
+   addUserKnob {20 User}
+   addUserKnob {7 depth_unit_divider R 0 500}
+   depth_unit_divider {{"parent.unit == 1 ? 10 : parent.unit == 2 ? 100 : parent.unit == 3 ? 1000 : parent.unit == 4 ? 25.4 : parent.unit == 5 ? 304.8 : 1"}}
+  }
+  Expression {
+   temp_name0 zdepth
+   temp_expr0 "r < parent.min_zdepth* _UNIT_MULTIPLIER_.value ? parent.min_zdepth* _UNIT_MULTIPLIER_.value : r"
+   temp_name1 focus_dist
+   temp_expr1 "s * _UNIT_MULTIPLIER_.value"
+   temp_name2 coc
+   temp_expr2 "(fabs(focus_dist - zdepth) * pow(f,2) / (N * zdepth * (focus_dist - f)))"
+   temp_name3 coc_px
+   temp_expr3 "fabs(coc / haperture * input.width / 2)"
+   channel0 rgba
+   expr0 coc_px
+   channel1 none
+   name Generate_Direct_Z
+   xpos 70
+   ypos 431
+   addUserKnob {20 Optical l "Optical Characteristics"}
+   addUserKnob {7 f l "focal length" R 0 500}
+   f {{parent.f}}
+   addUserKnob {7 N l f-stop R 0 44}
+   N {{parent.N}}
+   addUserKnob {7 haperture R 0 50}
+   haperture {{parent.haperture}}
+   addUserKnob {7 s l "focus distance" R 0 1000}
+   s {{parent.s}}
+  }
+push $Ne1523c00
+  Copy {
+   inputs 2
+   from0 rgba.red
+   to0 depth.Z
+   name Copy1
+   xpos 180
+   ypos 425
+  }
+  ZDefocus2 {
+   inputs 2
+   useGPUIfAvailable {{parent.parent.useGPU}}
+   math direct
+   size 1
+   max_size {{parent.parent.max_size}}
+   use_input_channels true
+   aspect {{parent.parent.aspect}}
+   name ZDefocus1
+   xpos 180
+   ypos 513
+  }
+  Clamp {
+   channels alpha
+   name Clamp3
+   xpos 180
+   ypos 689
+  }
+  Switch {
+   inputs 2
+   which {{parent.output}}
+   name Switch1
+   xpos 180
+   ypos 783
+  }
+  Output {
+   name Output1
+   xpos 180
+   ypos 827
+  }
+ end_group
+ Merge2 {
+  inputs 2
+  operation under
+  name Merge1
+  xpos -40
+  ypos 217
+ }
+ Merge2 {
+  inputs 2
+  operation under
+  name Merge2
+  xpos -40
+  ypos 261
+ }
+ Switch {
+  inputs 2
+  which {{parent.autoSlices}}
+  name Switch1
+  xpos -40
+  ypos 1267
+ }
+ Copy {
+  inputs 2
+  from0 depth.Z
+  to0 depth.Z
+  name Copy1
+  xpos -40
+  ypos 1437
+ }
+ Output {
+  name Output1
+  xpos -40
+  ypos 1487
+ }
+push $N9d4c8800
+ Dot {
+  name Dot8
+  xpos 1204
+  ypos -138
+ }
+ DeepToImage2 {
+  name DeepToImage6
+  xpos 1170
+  ypos -100
+ }
+set N9999e000 [stack 0]
+ Shuffle2 {
+  fromInput1 {{0} B}
+  in1 deep
+  fromInput2 {{0} B}
+  mappings "4 deep.back 0 1 rgba.red 0 0 deep.back 0 1 rgba.green 0 1 deep.back 0 1 rgba.blue 0 2 deep.back 0 1 rgba.alpha 0 3"
+  name Shuffle4
+  xpos 1170
+  ypos -12
+ }
+ Expression {
+  expr0 "r==inf? 0 : r"
+  expr1 "r==inf? 0 : r"
+  expr2 "r==inf? 0 : r"
+  expr3 "r==inf? 0 : r"
+  name Expression8
+  xpos 1170
+  ypos 32
+ }
+ CurveTool {
+  operation "Max Luma Pixel"
+  channels {rgba.red -rgba.green -rgba.blue none}
+  ROI {{bbox.x} {bbox.y} {bbox.r} {bbox.t}}
+  autocropdata {512 270 1536 810}
+  intensitydata {{curve}}
+  maxlumapixvalue {0 0 0}
+  minlumapixvalue {0 0 0}
+  name CurveTool2
+  xpos 1170
+  ypos 117
+ }
+push $N9999e000
+ Shuffle2 {
+  fromInput1 {{0} B}
+  in1 deep
+  fromInput2 {{0} B}
+  mappings "4 deep.front 0 0 rgba.red 0 0 deep.front 0 0 rgba.green 0 1 deep.front 0 0 rgba.blue 0 2 deep.front 0 0 rgba.alpha 0 3"
+  name Shuffle5
+  xpos 1280
+  ypos -10
+ }
+ Expression {
+  expr0 1/r
+  name Expression1
+  xpos 1280
+  ypos 34
+ }
+set N9999f400 [stack 0]
+push 0
+push 0
+ Viewer {
+  inputs 3
+  frame_range 1-100
+  input_number 2
+  colour_sample_bbox {-0.244140625 -0.1171875 -0.2431640625 -0.1162109375}
+  viewerProcess "sRGB (ACES)"
+  monitorOutNDISenderName "NukeX - untitled - Viewer1"
+  name Viewer1
+  xpos 1390
+  ypos 32
+ }
+push $N9999f400
+ CurveTool {
+  operation "Max Luma Pixel"
+  channels {rgba.red -rgba.green -rgba.blue none}
+  ROI {{bbox.x} {bbox.y} {bbox.r} {bbox.t}}
+  autocropdata {512 270 1536 810}
+  intensitydata {{curve}}
+  maxlumapixvalue {0 0 0}
+  minlumapixvalue {0 0 0}
+  name CurveTool1
+  xpos 1280
+  ypos 117
+ }
+end_group
