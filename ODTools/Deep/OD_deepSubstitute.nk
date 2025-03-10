@@ -1,0 +1,144 @@
+set cut_paste_input [stack 0]
+version 15.0 v3
+push $cut_paste_input
+Group {
+ name OD_deepSubstitute
+ tile_color 0x5fff
+ selected true
+ xpos 3375
+ ypos 700
+ addUserKnob {20 User}
+ addUserKnob {6 solid l "solid alpha" +STARTLINE}
+ solid true
+}
+ Constant {
+  inputs 0
+  color 1
+  name Constant1
+  xpos 180
+  ypos -385
+ }
+ Input {
+  inputs 0
+  name flat
+  xpos 290
+  ypos -449
+  number 1
+ }
+ Switch {
+  inputs 2
+  which {{parent.solid}}
+  name Switch1
+  xpos 290
+  ypos -361
+ }
+ Dot {
+  name Dot7
+  xpos 324
+  ypos -270
+ }
+set Nf9e75400 [stack 0]
+ Dot {
+  name Dot3
+  xpos -226
+  ypos -270
+ }
+ Dot {
+  name Dot4
+  xpos -226
+  ypos 214
+ }
+ Input {
+  inputs 0
+  name deep
+  xpos 70
+  ypos -141
+ }
+ Dot {
+  name Dot6
+  xpos 104
+  ypos -94
+ }
+set N3ef8400 [stack 0]
+ Dot {
+  name Dot5
+  xpos -116
+  ypos -94
+ }
+ DeepRecolor {
+  inputs 2
+  channels all
+  targetInputAlpha true
+  name DeepRecolor2
+  xpos -150
+  ypos 205
+ }
+push $N3ef8400
+ DeepToImage2 {
+  name DeepToImage1
+  xpos 70
+  ypos -53
+ }
+set N3ef9000 [stack 0]
+ Dot {
+  name Dot1
+  xpos -6
+  ypos -50
+ }
+ Expression {
+  expr3 depth.Z==0
+  name Expression1
+  xpos -40
+  ypos 79
+ }
+set N3ef9800 [stack 0]
+ Dot {
+  name Dot2
+  xpos -6
+  ypos 126
+ }
+push $Nf9e75400
+push $N3ef9800
+push $N3ef9000
+ Inpaint2 {
+  inputs 2
+  channels depth
+  fillRegion "Matte Alpha"
+  center {1024 540}
+  name Inpaint1
+  xpos 70
+  ypos 73
+ }
+ Copy {
+  inputs 2
+  channels rgba
+  name Copy1
+  xpos 290
+  ypos 67
+ }
+ Merge2 {
+  inputs 2
+  operation mask
+  bbox B
+  name Merge1
+  xpos 290
+  ypos 123
+ }
+ DeepFromImage {
+  premult true
+  name DeepFromImage1
+  xpos 290
+  ypos 167
+ }
+ DeepMerge2 {
+  inputs 2
+  name DeepMerge1
+  xpos 290
+  ypos 211
+ }
+ Output {
+  name Output1
+  xpos 290
+  ypos 387
+ }
+end_group

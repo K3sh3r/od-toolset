@@ -1,0 +1,554 @@
+set cut_paste_input [stack 0]
+version 15.0 v3
+push 0
+push 0
+push $cut_paste_input
+Group {
+ inputs 3
+ name OD_plateInsert
+ tile_color 0x4a5ec5ff
+ selected true
+ xpos 2990
+ ypos 1182
+ addUserKnob {20 User}
+ addUserKnob {6 first l "first in chain?" t "Establishes some under the hood channels if this node is the first in the chain" +STARTLINE}
+}
+ Input {
+  inputs 0
+  name plate
+  xpos -260
+  ypos 871
+  number 2
+ }
+ Dot {
+  name Dot3
+  xpos -226
+  ypos 918
+ }
+set N93f44400 [stack 0]
+ Dot {
+  name Dot19
+  xpos -226
+  ypos 962
+ }
+set N93f44800 [stack 0]
+ Input {
+  inputs 0
+  name fg
+  xpos -700
+  ypos 519
+  number 1
+ }
+ Dot {
+  name Dot15
+  xpos -666
+  ypos 610
+ }
+set N93f45000 [stack 0]
+ Dot {
+  name Dot10
+  xpos -776
+  ypos 610
+ }
+ Shuffle2 {
+  fromInput1 {{0} B}
+  fromInput2 {{0} B}
+  mappings "4 rgba.alpha 0 3 rgba.red 0 0 rgba.alpha 0 3 rgba.green 0 1 rgba.alpha 0 3 rgba.blue 0 2 rgba.alpha 0 3 rgba.alpha 0 3"
+  name Shuffle10
+  xpos -810
+  ypos 739
+ }
+ Merge2 {
+  inputs 2
+  operation mask
+  name Merge10
+  xpos -810
+  ypos 959
+ }
+ Dot {
+  name Dot16
+  xpos -776
+  ypos 1094
+ }
+ Input {
+  inputs 0
+  name bg
+  xpos -40
+  ypos -669
+ }
+ Dot {
+  name Dot32
+  xpos -6
+  ypos -625
+ }
+set N65b74800 [stack 0]
+add_layer {deep_orig deep_orig.red deep_orig.green deep_orig.blue deep_orig.alpha}
+ Shuffle2 {
+  fromInput1 {{0} B}
+  out1 deep_orig
+  fromInput2 {{0} B}
+  mappings "4 rgba.red 0 0 deep_orig.red 0 0 rgba.green 0 1 deep_orig.green 0 1 rgba.blue 0 2 deep_orig.blue 0 2 rgba.alpha 0 3 deep_orig.alpha 0 3"
+  name Shuffle16
+  xpos -150
+  ypos -581
+ }
+push $N65b74800
+ Switch {
+  inputs 2
+  which {{parent.first}}
+  name Switch1
+  xpos -40
+  ypos -537
+ }
+ Dot {
+  name Dot8
+  xpos -6
+  ypos -358
+ }
+set N65b75400 [stack 0]
+ Dot {
+  name Dot12
+  xpos -116
+  ypos -358
+ }
+set N65b75800 [stack 0]
+add_layer {element element.red element.green element.blue element.alpha}
+ Shuffle2 {
+  fromInput1 {{0} B}
+  in1 element
+  fromInput2 {{0} B}
+  mappings "4 element.red 0 0 rgba.red 0 0 element.green 0 1 rgba.green 0 1 element.blue 0 2 rgba.blue 0 2 element.alpha 0 3 rgba.alpha 0 3"
+  name Shuffle5
+  xpos -150
+  ypos -229
+ }
+ Dot {
+  name Dot21
+  xpos -116
+  ypos -138
+ }
+set Ndcea0000 [stack 0]
+push $N65b75800
+ Dot {
+  name Dot14
+  xpos -446
+  ypos -358
+ }
+set Ndcea0400 [stack 0]
+ Dot {
+  name Dot18
+  xpos -1106
+  ypos -355
+ }
+set Ndcea0800 [stack 0]
+ Dot {
+  name Dot13
+  xpos -1546
+  ypos -355
+ }
+add_layer {deep_stencilled deep_stencilled.red deep_stencilled.green deep_stencilled.blue deep_stencilled.alpha}
+ Shuffle2 {
+  fromInput1 {{0} B}
+  in1 deep_stencilled
+  fromInput2 {{0} B}
+  mappings "4 deep_stencilled.red 0 0 rgba.red 0 0 deep_stencilled.green 0 1 rgba.green 0 1 deep_stencilled.blue 0 2 rgba.blue 0 2 deep_stencilled.alpha 0 3 rgba.alpha 0 3"
+  name Shuffle12
+  xpos -1580
+  ypos -314
+ }
+ Dot {
+  name Dot20
+  xpos -1546
+  ypos -267
+ }
+set Ndcea1400 [stack 0]
+ Dot {
+  name Dot26
+  xpos -1436
+  ypos -267
+ }
+set Ndcea1800 [stack 0]
+ Shuffle2 {
+  fromInput1 {{0} B}
+  fromInput2 {{0} B}
+  mappings "4 rgba.alpha 0 3 rgba.red 0 0 rgba.alpha 0 3 rgba.green 0 1 rgba.alpha 0 3 rgba.blue 0 2 rgba.alpha 0 3 rgba.alpha 0 3"
+  name Shuffle7
+  xpos -1470
+  ypos -226
+ }
+ Copy {
+  inputs 2
+  from0 rgba.alpha
+  to0 rgba.alpha
+  name Copy3
+  xpos -1470
+  ypos -147
+ }
+ Merge2 {
+  inputs 2
+  operation under
+  name Merge4
+  xpos -1470
+  ypos 1094
+ }
+push $N93f44400
+push $N93f45000
+ Shuffle2 {
+  fromInput1 {{0} B}
+  fromInput2 {{0} B}
+  mappings "4 rgba.red 0 0 rgba.red 0 0 rgba.green 0 1 rgba.green 0 1 rgba.blue 0 2 rgba.blue 0 2 white -1 -1 rgba.alpha 0 3"
+  name Shuffle13
+  xpos -700
+  ypos 739
+ }
+ Merge2 {
+  inputs 2
+  operation mask
+  also_merge all
+  name Merge7
+  xpos -700
+  ypos 915
+ }
+ Dot {
+  name Dot27
+  xpos -666
+  ypos 1050
+ }
+push $Ndcea0000
+ Dot {
+  name Dot24
+  xpos -116
+  ypos -94
+ }
+set N5c47f400 [stack 0]
+push $Ndcea1400
+ Copy {
+  inputs 2
+  from0 rgba.alpha
+  to0 rgba.alpha
+  name Copy2
+  xpos -1580
+  ypos -103
+ }
+ Merge2 {
+  inputs 2
+  operation under
+  name Merge12
+  xpos -1580
+  ypos 1050
+ }
+ Copy {
+  inputs 2
+  from0 rgba.red
+  to0 rgba.alpha
+  name Copy1
+  xpos -1580
+  ypos 1088
+ }
+ Dot {
+  name Dot17
+  xpos -1546
+  ypos 1622
+ }
+push $Ndcea0400
+add_layer {plate_orig plate_orig.red plate_orig.green plate_orig.blue plate_orig.alpha}
+ Shuffle2 {
+  fromInput1 {{0} B}
+  in1 plate_orig
+  fromInput2 {{0} B}
+  mappings "4 plate_orig.red 0 0 rgba.red 0 0 plate_orig.green 0 1 rgba.green 0 1 plate_orig.blue 0 2 rgba.blue 0 2 plate_orig.alpha 0 3 rgba.alpha 0 3"
+  name Shuffle4
+  xpos -480
+  ypos -229
+ }
+ Dot {
+  name Dot4
+  xpos -446
+  ypos 1050
+ }
+set Necf84c00 [stack 0]
+push $N93f44800
+ Merge2 {
+  inputs 2
+  operation atop
+  name Merge16
+  xpos -260
+  ypos 1047
+ }
+ Dot {
+  name Dot7
+  xpos -226
+  ypos 1179
+ }
+set Necf85400 [stack 0]
+ Shuffle2 {
+  fromInput1 {{0} B}
+  in1 plate_orig
+  fromInput2 {{0} B}
+  mappings "4 plate_orig.red 0 0 rgba.red 0 0 plate_orig.green 0 1 rgba.green 0 1 plate_orig.blue 0 2 rgba.blue 0 2 plate_orig.alpha 0 3 rgba.alpha 0 3"
+  name Shuffle3
+  xpos -370
+  ypos 1176
+ }
+push $Necf84c00
+ Merge2 {
+  inputs 2
+  name Merge6
+  xpos -480
+  ypos 1176
+ }
+ Dot {
+  name Dot11
+  xpos -446
+  ypos 1531
+ }
+push $Ndcea1800
+ Dot {
+  name Dot22
+  xpos -1216
+  ypos -267
+ }
+push $Ndcea0800
+ Shuffle2 {
+  fromInput1 {{0} B}
+  in1 deep_orig
+  fromInput2 {{0} B}
+  mappings "4 deep_orig.red 0 0 rgba.red 0 0 deep_orig.green 0 1 rgba.green 0 1 deep_orig.blue 0 2 rgba.blue 0 2 deep_orig.alpha 0 3 rgba.alpha 0 3"
+  name Shuffle9
+  xpos -1140
+  ypos -226
+ }
+ Shuffle2 {
+  fromInput1 {{0} B}
+  fromInput2 {{0} B}
+  mappings "4 rgba.alpha 0 3 rgba.red 0 0 rgba.alpha 0 3 rgba.green 0 1 rgba.alpha 0 3 rgba.blue 0 2 rgba.alpha 0 3 rgba.alpha 0 3"
+  name Shuffle11
+  xpos -1140
+  ypos -182
+ }
+ Merge2 {
+  inputs 2
+  operation divide
+  name Merge11
+  xpos -1140
+  ypos -50
+ }
+set N91ef9000 [stack 0]
+ Dot {
+  name Dot25
+  xpos -1326
+  ypos -47
+ }
+push $N5c47f400
+ Dot {
+  name Dot23
+  xpos -116
+  ypos -6
+ }
+set N91ef9800 [stack 0]
+ Dot {
+  name Dot30
+  xpos -116
+  ypos 82
+ }
+set N91ef9c00 [stack 0]
+push $N91ef9000
+push $N91ef9800
+ Merge2 {
+  inputs 2
+  operation from
+  name Merge9
+  xpos -1140
+  ypos -6
+ }
+ Unpremult {
+  name Unpremult1
+  xpos -1140
+  ypos 38
+ }
+ Copy {
+  inputs 2
+  from0 rgba.alpha
+  to0 rgba.alpha
+  name Copy4
+  xpos -1140
+  ypos 73
+ }
+set N4e504800 [stack 0]
+ Shuffle2 {
+  fromInput1 {{0} B}
+  fromInput2 {{0} B}
+  mappings "4 rgba.alpha 0 3 rgba.red 0 0 rgba.alpha 0 3 rgba.green 0 1 rgba.alpha 0 3 rgba.blue 0 2 rgba.alpha 0 3 rgba.alpha 0 3"
+  name Shuffle15
+  xpos -1250
+  ypos 79
+ }
+ Merge2 {
+  inputs 2
+  operation divide
+  name Merge15
+  xpos -1360
+  ypos 79
+ }
+push $N93f45000
+push $N65b75400
+ Dot {
+  name Dot9
+  xpos -6
+  ypos 610
+ }
+set N4e505400 [stack 0]
+ Shuffle2 {
+  fromInput1 {{0} B}
+  fromInput2 {{0} B}
+  mappings "4 rgba.alpha 0 3 rgba.red 0 0 rgba.alpha 0 3 rgba.green 0 1 rgba.alpha 0 3 rgba.blue 0 2 rgba.alpha 0 3 rgba.alpha 0 3"
+  name Shuffle1
+  xpos -260
+  ypos 607
+ }
+ Merge2 {
+  inputs 2
+  operation divide
+  name Merge8
+  xpos -590
+  ypos 607
+ }
+ Dot {
+  name Dot28
+  xpos -556
+  ypos 654
+ }
+set N3a5c2000 [stack 0]
+ Shuffle2 {
+  fromInput1 {{0} B}
+  fromInput2 {{0} B}
+  mappings "4 rgba.alpha 0 3 rgba.red 0 0 rgba.alpha 0 3 rgba.green 0 1 rgba.alpha 0 3 rgba.blue 0 2 rgba.alpha 0 3 rgba.alpha 0 3"
+  name Shuffle14
+  xpos -1250
+  ypos 651
+ }
+ Merge2 {
+  inputs 2
+  operation divide
+  name Merge13
+  xpos -1360
+  ypos 651
+ }
+ Dot {
+  name Dot29
+  xpos -1326
+  ypos 698
+ }
+push $N4e504800
+ Premult {
+  name Premult1
+  xpos -1140
+  ypos 123
+ }
+ Merge2 {
+  inputs 2
+  operation atop
+  name Merge14
+  xpos -1140
+  ypos 695
+ }
+ Dot {
+  name Dot31
+  xpos -1106
+  ypos 786
+ }
+push $N3a5c2000
+ Merge2 {
+  inputs 2
+  operation atop
+  bbox B
+  output {rgba.red rgba.green rgba.blue -rgba.alpha}
+  name Merge2
+  xpos -590
+  ypos 783
+ }
+ Dot {
+  name Dot1
+  xpos -556
+  ypos 1267
+ }
+push $Necf85400
+ Merge2 {
+  inputs 2
+  operation atop
+  bbox B
+  output {rgba.red rgba.green rgba.blue -rgba.alpha}
+  name Merge5
+  xpos -260
+  ypos 1264
+ }
+ Dot {
+  name Dot2
+  xpos -226
+  ypos 1355
+ }
+set N19888800 [stack 0]
+ Dot {
+  name Dot5
+  xpos -226
+  ypos 1446
+ }
+push $N91ef9c00
+ Merge2 {
+  inputs 2
+  name Merge3
+  xpos -150
+  ypos 1443
+ }
+ Dot {
+  name Dot6
+  xpos -116
+  ypos 1487
+ }
+push $N19888800
+push $N4e505400
+ Merge2 {
+  inputs 2
+  operation atop
+  bbox B
+  output {rgba.red rgba.green rgba.blue -rgba.alpha}
+  name Merge1
+  xpos -40
+  ypos 1352
+ }
+ Shuffle2 {
+  inputs 2
+  fromInput1 {{1} B A}
+  out1 element
+  fromInput2 {{0} B A}
+  mappings "4 rgba.red 0 0 element.red 0 0 rgba.green 0 1 element.green 0 1 rgba.blue 0 2 element.blue 0 2 rgba.alpha 0 3 element.alpha 0 3"
+  name Shuffle2
+  xpos -40
+  ypos 1484
+ }
+ Shuffle2 {
+  inputs 2
+  fromInput1 {{1} B A}
+  out1 plate_orig
+  fromInput2 {{0} B A}
+  mappings "4 rgba.red 0 0 plate_orig.red 0 0 rgba.green 0 1 plate_orig.green 0 1 rgba.blue 0 2 plate_orig.blue 0 2 rgba.alpha 0 3 plate_orig.alpha 0 3"
+  name Shuffle6
+  xpos -40
+  ypos 1528
+ }
+ Shuffle2 {
+  inputs 2
+  fromInput1 {{1} B A}
+  out1 deep_stencilled
+  fromInput2 {{0} B A}
+  mappings "4 rgba.red 0 0 deep_stencilled.red 0 0 rgba.green 0 1 deep_stencilled.green 0 1 rgba.blue 0 2 deep_stencilled.blue 0 2 rgba.alpha 0 3 deep_stencilled.alpha 0 3"
+  name Shuffle8
+  xpos -40
+  ypos 1616
+ }
+ Output {
+  name Output1
+  xpos -40
+  ypos 1704
+ }
+end_group
