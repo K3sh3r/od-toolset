@@ -4,19 +4,19 @@ define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
 <layout version="1.0">
     <window x="-1" y="-8" w="2560" h="1369" maximized="1" screen="0">
         <splitter orientation="1">
-            <split size="79"/>
-            <dock id="" hideTitles="1" activePageId="Toolbar.1" focus="true">
+            <split size="40"/>
+            <dock id="" hideTitles="1" activePageId="Toolbar.1">
                 <page id="Toolbar.1"/>
             </dock>
-            <split size="1151" stretch="1"/>
+            <split size="1897" stretch="1"/>
             <splitter orientation="2">
                 <split size="1331"/>
                 <dock id="" activePageId="Viewer.1">
                     <page id="Viewer.1"/>
                 </dock>
             </splitter>
-            <split size="1322"/>
-            <dock id="" activePageId="Properties.1">
+            <split size="615"/>
+            <dock id="" activePageId="Properties.1" focus="true">
                 <page id="Properties.1"/>
                 <page id="uk.co.thefoundry.backgroundrenderview.1"/>
             </dock>
@@ -27,7 +27,6 @@ define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
             <split size="1318"/>
             <dock id="" activePageId="DAG.1">
                 <page id="DAG.1"/>
-                <page id="DAG.2"/>
             </dock>
             <split size="598"/>
             <dock id="" activePageId="DopeSheet.1">
@@ -62,20 +61,21 @@ Group {
  name PBlur1
  tile_color 0xcc7f4dff
  label "\[value size]"
+ selected true
  xpos -260
  ypos 645
  addUserKnob {20 PBlur}
  addUserKnob {41 "Local GPU: " T BlinkScript5.gpuName}
  addUserKnob {41 "Use GPU if Available" T BlinkScript5.useGPUIfAvailable}
- addUserKnob {26 "" +STARTLINE}
+ addUserKnob {26 ""}
  addUserKnob {41 channel l "position channel" T Shuffle1.in}
- addUserKnob {26 "" +STARTLINE}
+ addUserKnob {26 ""}
  addUserKnob {41 size T BlinkScript5.PBlur_size}
  addUserKnob {7 falloff l "falloff softness"}
  falloff 1
  addUserKnob {4 power l "falloff power" M {linear quadratic cubic quartic}}
- addUserKnob {26 "" +STARTLINE}
  addUserKnob {41 ratio t "Screen space to world space ratio used for efficiency reasons. This is the largest number of pixels visible in a one unit radius in 3D space" T BlinkScript5.PBlur_ratio}
+ addUserKnob {26 ""}
  addUserKnob {26 credits l "" +STARTLINE T "PBlur v1.0 | Oliver Daniels 2025"}
  addUserKnob {26 website l "" +STARTLINE T "<b><font color=#ffffff><a href=\"http://www.oliverdaniels.net\"><span style=\"color:#C8C8C8;\">oliverdaniels.net</span></a><b>"}
 }
@@ -85,7 +85,7 @@ Group {
   xpos -150
   ypos 519
  }
-set Nee85c800 [stack 0]
+set N2ae2f800 [stack 0]
  Shuffle {
   in P
   name Shuffle1
@@ -97,7 +97,7 @@ set Nee85c800 [stack 0]
   xpos -226
   ypos 610
  }
-push $Nee85c800
+push $N2ae2f800
  BlinkScript {
   inputs 2
   recompileCount 56
