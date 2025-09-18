@@ -1,0 +1,123 @@
+#! D:/Program Files/Nuke15.0v3/nuke-15.0.3.dll -nx
+version 15.0 v3
+define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
+<layout version="1.0">
+    <window x="-1" y="-8" w="2560" h="1369" maximized="1" screen="0">
+        <splitter orientation="1">
+            <split size="79"/>
+            <dock id="" hideTitles="1" activePageId="Toolbar.1" focus="true">
+                <page id="Toolbar.1"/>
+            </dock>
+            <split size="1151" stretch="1"/>
+            <splitter orientation="2">
+                <split size="1331"/>
+                <dock id="" activePageId="Viewer.1">
+                    <page id="Viewer.1"/>
+                </dock>
+            </splitter>
+            <split size="1322"/>
+            <dock id="" activePageId="Properties.1">
+                <page id="Properties.1"/>
+                <page id="uk.co.thefoundry.backgroundrenderview.1"/>
+            </dock>
+        </splitter>
+    </window>
+    <window x="2567" y="0" w="1080" h="1920" maximized="1" fullscreen="1" screen="1">
+        <splitter orientation="2">
+            <split size="1318"/>
+            <dock id="" activePageId="DAG.1">
+                <page id="DAG.1"/>
+                <page id="DAG.2"/>
+            </dock>
+            <split size="598"/>
+            <dock id="" activePageId="DopeSheet.1">
+                <page id="Curve Editor.1"/>
+                <page id="DopeSheet.1"/>
+            </dock>
+        </splitter>
+    </window>
+</layout>
+}
+Root {
+ inputs 0
+ name D:/gitRepos/od-toolset/ODTools/CG/PBlur.nk
+ frame 16
+ format "1920 1080 0 0 1920 1080 1 HD_1080"
+ proxy_type scale
+ proxy_format "1024 778 0 0 1024 778 1 1K_Super_35(full-ap)"
+ colorManagement OCIO
+ OCIO_config aces_1.2
+ defaultViewerLUT "OCIO LUTs"
+ workingSpaceLUT scene_linear
+ monitorLut "sRGB (ACES)"
+ monitorOutLUT "sRGB (ACES)"
+ int8Lut "Output - sRGB"
+ int16Lut texture_paint
+ logLut compositing_log
+ floatLut scene_linear
+}
+add_layer {P P.red P.green P.blue P.alpha}
+Group {
+ inputs 0
+ name PBlur1
+ tile_color 0xcc7f4dff
+ label "\[value size]"
+ xpos -260
+ ypos 645
+ addUserKnob {20 PBlur}
+ addUserKnob {41 "Local GPU: " T BlinkScript5.gpuName}
+ addUserKnob {41 "Use GPU if Available" T BlinkScript5.useGPUIfAvailable}
+ addUserKnob {26 "" +STARTLINE}
+ addUserKnob {41 channel l "position channel" T Shuffle1.in}
+ addUserKnob {26 "" +STARTLINE}
+ addUserKnob {41 size T BlinkScript5.PBlur_size}
+ addUserKnob {7 falloff l "falloff softness"}
+ falloff 1
+ addUserKnob {4 power l "falloff power" M {linear quadratic cubic quartic}}
+ addUserKnob {26 "" +STARTLINE}
+ addUserKnob {41 ratio t "Screen space to world space ratio used for efficiency reasons. This is the largest number of pixels visible in a one unit radius in 3D space" T BlinkScript5.PBlur_ratio}
+ addUserKnob {26 credits l "" +STARTLINE T "PBlur v1.0 | Oliver Daniels 2025"}
+ addUserKnob {26 website l "" +STARTLINE T "<b><font color=#ffffff><a href=\"http://www.oliverdaniels.net\"><span style=\"color:#C8C8C8;\">oliverdaniels.net</span></a><b>"}
+}
+ Input {
+  inputs 0
+  name src
+  xpos -150
+  ypos 519
+ }
+set Nee85c800 [stack 0]
+ Shuffle {
+  in P
+  name Shuffle1
+  xpos -260
+  ypos 563
+ }
+ Dot {
+  name Dot1
+  xpos -226
+  ypos 610
+ }
+push $Nee85c800
+ BlinkScript {
+  inputs 2
+  recompileCount 56
+  ProgramGroup 1
+  KernelDescription "3 \"PBlur\" iterate pixelWise 06928c4de9ce59dc17959d038ea5b4b500f939bb9ff22add306f720706b768cc 3 \"src\" Read Ranged2D \"P\" Read Ranged2D \"dst\" Write Point 4 \"size\" Float 1 AACgQA== \"falloff\" Float 1 AACAPw== \"ratio\" Int 1 AAAAAA== \"power\" Float 1 AACAPw== 4 \"size\" 1 1 Default \"falloff\" 1 1 Default \"ratio\" 1 1 Default \"power\" 1 1 Default 5 \"srcrangeMin\" Int 2 1 AAAAAAAAAAA= \"srcrangeMax\" Int 2 1 AAAAAAAAAAA= \"PrangeMin\" Int 2 1 AAAAAAAAAAA= \"PrangeMax\" Int 2 1 AAAAAAAAAAA= \"_filterSize\" Int 1 1 AAAAAA=="
+  kernelSource "\nkernel PBlur : ImageComputationKernel<ePixelWise>\n\{\n  Image<eRead, eAccessRanged2D, eEdgeClamped> src; // rgb input\n  Image<eRead, eAccessRanged2D, eEdgeClamped> P; // position input\n  Image<eWrite> dst; // output image\n\n  param:\n    float size;\n    float falloff;\n    int ratio;\n    float power;\n\n  local:\n    int _filterSize;\n\n  void define() \{\n    defineParam(size, \"size\", 5.0f);\n    defineParam(falloff, \"falloff\", 1.0f);\n    defineParam(power, \"power\", 1.0f);\n  \}\n\n  void init() \{\n    _filterSize = ceil(size*ratio);\n    src.setRange(-_filterSize, -_filterSize, _filterSize, _filterSize);\n    P.setRange(-_filterSize, -_filterSize, _filterSize, _filterSize);  \n  \}\n\n  void process(int2 pos) \{\n\n    SampleType(src) valueSum(0);\n    ValueType(src) filterSum(0);\n    \n\n    for (int j = -_filterSize; j < _filterSize; j++) \{\n      for (int i = -_filterSize; i < _filterSize; i++) \{\n        SampleType(src) subVal(0);\n        if( i == 0 && j == 0 ) \{\n          valueSum += src(0, 0);\n          filterSum += 1;\n        \} else if (pos.x+i >= src.bounds.x1 && pos.x+i <= src.bounds.x2 && pos.y+j >= src.bounds.y1 && pos.y+j <= src.bounds.y2) \{\n          float hypot = sqrt(pow(P(i, j, 0)-P(0, 0, 0), 2) + pow(P(i, j, 1)-P(0, 0, 1), 2) + pow(P(i, j, 2)-P(0, 0, 2), 2));\n          if( hypot <= size ) \{\n            float strength = pow(clamp((1 - clamp(hypot/size, 0, 1))/falloff, 0, 1), power);\n            valueSum += src(i, j)*strength;\n            filterSum += 1*strength;\n          \}\n        \}\n      \}\n    \}\n\n    valueSum /= filterSum;\n\n    dst() = valueSum;\n  \}\n\};"
+  rebuild ""
+  PBlur_size 1
+  PBlur_falloff {{parent.falloff}}
+  PBlur_ratio 20
+  PBlur_power {{parent.power+1}}
+  rebuild_finalise ""
+  name BlinkScript5
+  selected true
+  xpos -150
+  ypos 601
+ }
+ Output {
+  name Output1
+  xpos -150
+  ypos 695
+ }
+end_group
