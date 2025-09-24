@@ -1,8 +1,5 @@
-set cut_paste_input [stack 0]
-version 15.0 v3
-push $cut_paste_input
 Group {
- name OD_depthToHaze
+ name depthToHaze
  knobChanged "k = nuke.thisKnob()\nn = nuke.thisNode()\nif k.name() == \"pickBlacklevel\":\n    n\[\"pickDepth\"].setEnabled(k.value())"
  tile_color 0x79a9ffff
  selected true
