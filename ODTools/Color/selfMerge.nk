@@ -1,0 +1,85 @@
+Group {
+ name selfMerge
+ tile_color 0x79a8ffff
+ selected true
+ xpos -255
+ ypos 59
+ addUserKnob {20 User}
+ addUserKnob {41 channels T Dissolve1.channels}
+ addUserKnob {26 ""}
+ addUserKnob {41 iterations T Grade2.gamma}
+ addUserKnob {6 clampFix l "fix clamped alpha" +STARTLINE}
+ addUserKnob {26 ""}
+ addUserKnob {26 mask l "" +STARTLINE T mask}
+ addUserKnob {41 maskChannelMask l "" -STARTLINE T Dissolve1.maskChannelMask}
+ addUserKnob {41 inject -STARTLINE T Dissolve1.inject}
+ addUserKnob {41 invert_mask l invert -STARTLINE T Dissolve1.invert_mask}
+ addUserKnob {41 fringe -STARTLINE T Dissolve1.fringe}
+ addUserKnob {41 mix T Dissolve1.which}
+}
+ Input {
+  inputs 0
+  name mask
+  xpos 70
+  ypos 299
+  number 1
+ }
+ Input {
+  inputs 0
+  name Input
+  xpos -40
+  ypos -53
+ }
+set Nab408000 [stack 0]
+ Invert {
+  name Invert1
+  xpos -40
+  ypos -15
+ }
+ Grade {
+  channels all
+  black {{"parent.clampFix==1?0.000001 : 0"}}
+  gamma {{"pow(1/parent.Grade2.gamma, 2)"}}
+  black_clamp false
+  name Grade1
+  xpos -40
+  ypos 29
+ }
+ Grade {
+  channels all
+  gamma 2
+  black_clamp false
+  name Grade2
+  xpos -40
+  ypos 73
+ }
+ Invert {
+  name Invert2
+  xpos -40
+  ypos 205
+ }
+push $Nab408000
+ Dot {
+  name Dot2
+  xpos -116
+  ypos -50
+ }
+ Dot {
+  name Dot1
+  xpos -116
+  ypos 302
+ }
+ Dissolve {
+  inputs 2+1
+  channels alpha
+  which 1
+  name Dissolve1
+  xpos -40
+  ypos 293
+ }
+ Output {
+  name Output1
+  xpos -40
+  ypos 343
+ }
+end_group
